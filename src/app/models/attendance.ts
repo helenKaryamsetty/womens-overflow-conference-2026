@@ -2,7 +2,6 @@ export type ConnectionState = 'connected' | 'connecting' | 'offline' | 'syncing'
 
 export interface Attendee {
   sourceRow: number;
-  timestamp: string;
   name: string;
   phoneNumber: string;
   location: string;
@@ -11,18 +10,25 @@ export interface Attendee {
 }
 
 export interface AttendanceSummary {
-  totalRegistered: number;
   checkedIn: number;
-  yetToArrive: number;
   walkIns: number;
   totalCheckedIn: number;
 }
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
-  attendees?: T;
+  count?: number;
+  data?: T;
   message?: string;
   error?: { code?: string; message?: string };
+}
+
+export interface CheckInRecord {
+  name: string;
+  phoneNumber: string;
+  location: string;
+  registrationType: 'REGISTRATION' | 'WALK_IN';
+  checkInTime: string;
 }
 
 export interface WalkInRegistration {

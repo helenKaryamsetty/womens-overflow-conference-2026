@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Subject, takeUntil, timer } from 'rxjs';
+import { debounceTime, distinctUntilChanged, exhaustMap } from 'rxjs/operators';
 
 import { Attendee, AttendanceSummary, ConnectionState, WalkInRegistration } from '../../models/attendance';
 import { AttendeeService } from '../../services/attendee.service';
@@ -21,7 +21,7 @@ export class CheckInHomeComponent implements OnInit, OnDestroy {
   readonly searchControl = new FormControl('');
   readonly destroy$ = new Subject<void>();
 
-  stats: AttendanceSummary = { totalRegistered: 0, checkedIn: 0, yetToArrive: 0, walkIns: 0, totalCheckedIn: 0 };
+  stats: AttendanceSummary = { checkedIn: 0, walkIns: 0, totalCheckedIn: 0 };
   attendees: Attendee[] = [];
   results: Attendee[] = [];
   recentArrivals: Attendee[] = [];
@@ -60,6 +60,16 @@ export class CheckInHomeComponent implements OnInit, OnDestroy {
     this.latestSearchRequest += 1;
   }
 
+  showRecentArrivals(): void {
+    this.showAllArrivals = true;
+    this.clearSearch();
+    requestAnimationFrame(() => {
+      document.getElementById('recent-arrivals')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  showAllArrivals = false;
+
   runSearch(query: string): void {
     const trimmed = query.trim();
     this.latestSearchRequest += 1;
@@ -83,7 +93,7 @@ export class CheckInHomeComponent implements OnInit, OnDestroy {
     this.isCheckingInId = attendee.sourceRow;
     this.toast = null;
 
-    this.attendeeService.checkIn(attendee.sourceRow).subscribe((response) => {
+    this.attendeeService.checkIn(attendee).subscribe((response) => {
       this.isCheckingInId = null;
 
       if (response.success) {
@@ -140,23 +150,35 @@ export class CheckInHomeComponent implements OnInit, OnDestroy {
   }
 
   retryLoad(): void {
-    this.loadAttendees();
+    this.loadAttendees(true);
   }
 
-  private loadAttendees(): void {
+  private loadAttendees(reload = false): void {
     this.isLoadingAttendees = true;
     this.loadError = null;
     this.connectionState = 'connecting';
-    this.attendeeService.loadAttendees().subscribe((response) => {
+    this.attendeeService.loadAttendees(reload).subscribe((response) => {
       this.isLoadingAttendees = false;
       if (!response.success) {
         this.connectionState = 'error';
         this.loadError = response.message ?? response.error?.message ?? 'Attendees could not be loaded.';
         return;
       }
-      this.attendees = response.attendees ?? [];
+      this.attendees = response.data ?? [];
       this.connectionState = 'connected';
+      this.runSearch(this.searchControl.value ?? '');
       this.refreshDashboard();
+      this.startCheckInRefresh();
+    });
+  }
+
+  private startCheckInRefresh(): void {
+    timer(4000, 4000).pipe(
+      exhaustMap(() => this.attendeeService.refreshCheckIns()),
+      takeUntil(this.destroy$),
+    ).subscribe((response) => {
+      this.connectionState = response.success ? 'connected' : 'offline';
+      if (response.success) this.refreshDashboard();
     });
   }
 

@@ -1,0 +1,18 @@
+[build]
+  command = "npm run build"
+  publish = "dist/women-overflow-conference-2026/browser"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/api/apps-script"
+  to = "/.netlify/functions/apps-script"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,11 +1,11 @@
 {
   "/api/apps-script": {
-    "target": "https://script.google.com",
+    "target": "https://script.google.com/macros/s/AKfycbyGUiwMFstADn-60eE86ANrZR9Mp3yyVE-duk-o7fQ01tu_E--_NCO231s9TTp8s7AA/exec",
     "secure": true,
     "changeOrigin": true,
     "followRedirects": true,
     "pathRewrite": {
-      "^/api/apps-script$": "/macros/s/AKfycbzvtEZxl_ti-WZzI8Gb-2gKznHwJOnzR3ZzutolAS7u3ulMx_U0IhXnSqe3nZNoxXE/exec"
+      "^/api/apps-script": ""
     }
   }
 }

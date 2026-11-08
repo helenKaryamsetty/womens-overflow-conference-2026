@@ -1,5 +1,5 @@
 <main class="checkin-page">
-  <div class="checkin-shell" [class.searching-mode]="!!searchControl.value || isSearching">
+  <div class="checkin-shell" [class.searching-mode]="!!searchControl.value">
     <aside class="sidebar">
       <a class="brand-lockup" href="/" aria-label="Women’s Overflow home">
         <span class="brand-mark">WOMEN’S</span>
@@ -16,14 +16,10 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="4" /><path d="M2 21v-2a7 7 0 0 1 11-5.7M19 8v8m-4-4h8" /></svg>
           <span>Walk-in Registration</span>
         </button>
-        <a class="nav-item" href="#recent-arrivals">
+        <button class="nav-item" type="button" (click)="showRecentArrivals()">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
           <span>Recent Arrivals</span>
-        </a>
-        <span class="nav-item unavailable" aria-disabled="true">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20v-6h4v6zm6 0V9h4v11zm6 0V4h4v16z" /></svg>
-          <span>Reports</span>
-        </span>
+        </button>
       </nav>
       <div class="sidebar-flower" aria-hidden="true"></div>
     </aside>
@@ -33,8 +29,8 @@
         <div class="welcome-title">
           <p class="eyebrow">WELCOME DESK</p>
           <div class="title-row">
-            <button type="button" class="back-search" *ngIf="searchControl.value || isSearching" (click)="clearSearch()">← <span>Back</span></button>
-            <h1>{{ searchControl.value || isSearching ? 'Search Results' : 'Check-In' }}</h1>
+            <button type="button" class="back-search" *ngIf="searchControl.value" (click)="clearSearch()">← <span>Back</span></button>
+            <h1>{{ searchControl.value ? 'Search Results' : 'Check-In' }}</h1>
           </div>
           <p class="page-subtitle">Find a registration and check in attendees.</p>
         </div>
@@ -53,9 +49,9 @@
       <div class="toast" *ngIf="toast" [class.success]="toast.type === 'success'" [class.error]="toast.type === 'error'" role="status" aria-live="polite">{{ toast.message }}</div>
 
       <section class="search-panel" aria-label="Find an attendee">
-        <label class="searchbox" [class.searching]="isSearching">
+        <label class="searchbox">
           <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.2" /><path d="m16 16 5 5" /></svg>
-          <input type="search" [formControl]="searchControl" placeholder="Search by name or mobile number..." aria-label="Search attendees by name or phone" />
+          <input #searchInput type="search" [formControl]="searchControl" (input)="runSearch(searchInput.value)" placeholder="Search by name or mobile number..." aria-label="Search attendees by name or phone" />
           <button type="button" class="clear-button" *ngIf="searchControl.value" (click)="clearSearch()" aria-label="Clear search">×</button>
         </label>
       </section>
@@ -66,22 +62,12 @@
         <button type="button" class="checkin-button" (click)="retryLoad()">Retry</button>
       </section>
 
-      <section class="dashboard-row" *ngIf="!isLoadingAttendees && !loadError && !searchControl.value && !isSearching" aria-live="polite">
+      <section class="dashboard-row" *ngIf="!isLoadingAttendees && !loadError && !searchControl.value" aria-live="polite">
         <div class="stats-grid">
-          <article class="stat-card">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm13 10v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8" /></svg>
-            <strong>{{ stats.totalRegistered }}</strong>
-            <span>Registered</span>
-          </article>
           <article class="stat-card featured">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m8 12 2.5 2.5L16.5 9" /></svg>
             <strong>{{ stats.checkedIn }}</strong>
             <span>Checked In</span>
-          </article>
-          <article class="stat-card">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
-            <strong>{{ stats.yetToArrive }}</strong>
-            <span>Yet to Arrive</span>
           </article>
           <article class="stat-card">
             <strong>{{ stats.walkIns }}</strong>
@@ -98,7 +84,7 @@
         </button>
       </section>
 
-      <section class="results-panel" *ngIf="!loadError && (searchControl.value || isSearching)">
+      <section class="results-panel" *ngIf="!isLoadingAttendees && !loadError && searchControl.value">
         <div class="results-header">
           <h2>Search Results</h2>
           <span>{{ results.length }} {{ results.length === 1 ? 'result' : 'results' }} found</span>
@@ -110,7 +96,6 @@
               <div class="attendee-meta">
                 <h3>{{ attendee.name }}</h3>
                 <p class="registration-id">{{ attendee.phoneNumber }} <span aria-hidden="true">•</span> {{ attendee.location }}</p>
-                <p class="attendee-email">Registered {{ attendee.timestamp | date: 'short' }}</p>
               </div>
             </div>
             <span class="status-pill" [class.checked-in]="attendee.checkedIn" [class.pending]="!attendee.checkedIn">
@@ -127,22 +112,27 @@
           </article>
         </div>
         <ng-template #emptyState>
-          <div class="empty-state"><p>{{ isSearching ? 'Searching attendees…' : 'No registrations found.' }}</p></div>
+          <div class="empty-state"><p>No registrations found.</p></div>
         </ng-template>
       </section>
 
-      <section class="recent-panel" id="recent-arrivals" *ngIf="recentArrivals.length && !searchControl.value && !isSearching">
+      <section class="recent-panel" id="recent-arrivals" *ngIf="!isLoadingAttendees && !loadError && !searchControl.value">
         <div class="results-header">
-          <h2>Recent Arrivals</h2>
-          <a href="#recent-arrivals">View All <span aria-hidden="true">→</span></a>
+          <h2>{{ showAllArrivals ? 'All Checked-In Attendees' : 'Recent Arrivals' }}</h2>
+          <button class="view-all-button" type="button" (click)="showAllArrivals = !showAllArrivals">
+            {{ showAllArrivals ? 'Show Recent' : 'View All' }} <span aria-hidden="true">{{ showAllArrivals ? '↑' : '→' }}</span>
+          </button>
         </div>
-        <ul class="recent-list">
-          <li *ngFor="let attendee of recentArrivals">
+        <ul class="recent-list" *ngIf="recentArrivals.length; else noRecentArrivals">
+          <li *ngFor="let attendee of (showAllArrivals ? recentArrivals : recentArrivals.slice(0, 5))">
             <span class="recent-avatar">{{ attendee.name.charAt(0) }}</span>
             <span class="recent-person"><strong>{{ attendee.name }}</strong><small>{{ attendee.phoneNumber }} <span aria-hidden="true">•</span> {{ attendee.checkedInAt | date: 'shortTime' }}</small></span>
             <span class="recent-status">✓ Checked In</span>
           </li>
         </ul>
+        <ng-template #noRecentArrivals>
+          <p class="empty-state">No arrivals yet.</p>
+        </ng-template>
       </section>
     </section>
   </div>

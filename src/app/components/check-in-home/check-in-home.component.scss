@@ -914,11 +914,16 @@ h1 {
   font-size: 0.73rem;
 }
 
-.results-header > a {
+.results-header > a,
+.results-header > .view-all-button {
+  padding: 0;
+  border: 0;
   color: #672342;
+  background: transparent;
   font-size: 0.72rem;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .results-list {

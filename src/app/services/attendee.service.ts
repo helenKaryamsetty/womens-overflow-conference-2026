@@ -1,31 +1,55 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, shareReplay, tap } from 'rxjs';
 
-import { ApiResponse, Attendee, WalkInRegistration } from '../models/attendance';
+import { ApiResponse, Attendee, CheckInRecord, WalkInRegistration } from '../models/attendance';
 
 const API_URL = '/api/apps-script';
 const textHeaders = new HttpHeaders({ 'Content-Type': 'text/plain;charset=utf-8' });
+type AttendeeRecord = Pick<Attendee, 'sourceRow' | 'name' | 'phoneNumber' | 'location'>;
+type AttendeeListResponse = ApiResponse<AttendeeRecord[]> & { attendees?: AttendeeRecord[] };
 
 @Injectable({ providedIn: 'root' })
 export class AttendeeService {
   private attendees: Attendee[] = [];
-  private walkIns = 0;
+  private checkIns: CheckInRecord[] = [];
+  private attendeeLoad$?: Observable<ApiResponse<Attendee[]>>;
 
   constructor(private readonly http: HttpClient) {}
 
-  loadAttendees(): Observable<ApiResponse<Attendee[]>> {
-    return this.http.get<ApiResponse<Array<Omit<Attendee, 'checkedIn' | 'checkedInAt'>>>>(API_URL).pipe(
-      map((response) => ({
-        success: response.success,
-        message: response.message,
-        attendees: response.attendees?.map((attendee) => ({ ...attendee, checkedIn: false })),
-      })),
-      tap((response) => {
-        if (response.success) {
-          this.attendees = response.attendees ?? [];
-          this.walkIns = 0;
+  loadAttendees(reload = false): Observable<ApiResponse<Attendee[]>> {
+    if (reload || !this.attendeeLoad$) {
+      this.attendeeLoad$ = forkJoin({
+      attendees: this.http.get<AttendeeListResponse>(API_URL, { params: { action: 'getAll' } }),
+      checkIns: this.http.get<ApiResponse<CheckInRecord[]>>(API_URL, { params: { action: 'checkIns' } }),
+    }).pipe(
+      map(({ attendees, checkIns }) => {
+        if (!attendees.success || !checkIns.success) {
+          return { success: false, message: attendees.message ?? checkIns.message ?? 'Attendees could not be loaded.' };
         }
+
+        this.attendees = (attendees.data ?? attendees.attendees ?? []).map((attendee) => ({
+          sourceRow: attendee.sourceRow,
+          name: attendee.name,
+          phoneNumber: attendee.phoneNumber,
+          location: attendee.location,
+          checkedIn: false,
+        }));
+        this.applyCheckIns(checkIns.data ?? []);
+        return { success: true, data: this.attendees };
+      }),
+      catchError((error: unknown) => of({ success: false, message: this.errorMessage(error) })),
+      shareReplay({ bufferSize: 1, refCount: false }),
+      );
+    }
+
+    return this.attendeeLoad$;
+  }
+
+  refreshCheckIns(): Observable<ApiResponse<CheckInRecord[]>> {
+    return this.http.get<ApiResponse<CheckInRecord[]>>(API_URL, { params: { action: 'checkIns' } }).pipe(
+      tap((response) => {
+        if (response.success) this.applyCheckIns(response.data ?? []);
       }),
       catchError((error: unknown) => of({ success: false, message: this.errorMessage(error) })),
     );
@@ -48,36 +72,59 @@ export class AttendeeService {
   getStats() {
     const checkedIn = this.attendees.filter((attendee) => attendee.checkedIn).length;
     return {
-      totalRegistered: this.attendees.length,
       checkedIn,
-      yetToArrive: this.attendees.length - checkedIn,
-      walkIns: this.walkIns,
-      totalCheckedIn: checkedIn + this.walkIns,
+      walkIns: this.checkIns.filter((checkIn) => checkIn.registrationType === 'WALK_IN').length,
+      totalCheckedIn: this.checkIns.length,
     };
   }
 
   recentArrivals(): Attendee[] {
     return this.attendees.filter((attendee) => attendee.checkedIn)
-      .sort((left, right) => (right.checkedInAt ?? '').localeCompare(left.checkedInAt ?? ''))
-      .slice(0, 5);
+      .sort((left, right) => (right.checkedInAt ?? '').localeCompare(left.checkedInAt ?? ''));
   }
 
-  checkIn(sourceRow: number): Observable<ApiResponse> {
-    return this.post({ action: 'checkIn', sourceRow }).pipe(tap((response) => {
+  checkIn(attendee: Attendee): Observable<ApiResponse> {
+    return this.post({
+      action: 'checkIn',
+      sourceRow: attendee.sourceRow,
+    }).pipe(tap((response) => {
       if (response.success) {
-        const attendee = this.attendees.find((entry) => entry.sourceRow === sourceRow);
-        if (attendee && !attendee.checkedIn) {
-          attendee.checkedIn = true;
-          attendee.checkedInAt = new Date().toISOString();
-        }
+        this.applyCheckIns([...this.checkIns, this.toCheckInRecord(attendee, 'REGISTRATION')]);
       }
     }));
   }
 
   registerWalkIn(attendee: WalkInRegistration): Observable<ApiResponse> {
-    return this.post({ action: 'walkIn', attendee }).pipe(tap((response) => {
-      if (response.success) this.walkIns += 1;
+    return this.post({
+      action: 'walkIn',
+      attendee,
+    }).pipe(tap((response) => {
+      if (response.success) this.applyCheckIns([...this.checkIns, this.toCheckInRecord(attendee, 'WALK_IN')]);
     }));
+  }
+
+  private applyCheckIns(checkIns: CheckInRecord[]): void {
+    this.checkIns = checkIns;
+    const recordsByPhone = new Map(checkIns.map((checkIn) => [this.normalizePhone(checkIn.phoneNumber), checkIn]));
+    this.attendees.forEach((attendee) => {
+      const record = recordsByPhone.get(this.normalizePhone(attendee.phoneNumber));
+      attendee.checkedIn = !!record;
+      attendee.checkedInAt = record?.checkInTime;
+    });
+  }
+
+  private toCheckInRecord(attendee: WalkInRegistration, registrationType: CheckInRecord['registrationType']): CheckInRecord {
+    return {
+      name: attendee.name,
+      phoneNumber: attendee.phoneNumber,
+      location: attendee.location,
+      registrationType,
+      checkInTime: new Date().toISOString(),
+    };
+  }
+
+  private normalizePhone(phone: string): string {
+    return phone.replace(/\D/g, '');
   }
 
   private post(payload: object): Observable<ApiResponse> {
