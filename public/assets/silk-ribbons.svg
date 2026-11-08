@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 650" fill="none">
+  <defs>
+    <linearGradient id="silk-a" x1="295" y1="62" x2="1313" y2="394" gradientUnits="userSpaceOnUse"><stop stop-color="#F5D1C9" stop-opacity=".08"/><stop offset=".47" stop-color="#C46C83" stop-opacity=".5"/><stop offset="1" stop-color="#73183E" stop-opacity=".18"/></linearGradient>
+    <linearGradient id="silk-b" x1="621" y1="-8" x2="1198" y2="449" gradientUnits="userSpaceOnUse"><stop stop-color="#F9E2D6" stop-opacity=".6"/><stop offset=".44" stop-color="#D58B99" stop-opacity=".22"/><stop offset="1" stop-color="#7A1D48" stop-opacity=".36"/></linearGradient>
+    <linearGradient id="gold" x1="340" y1="89" x2="1396" y2="379" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF0C9"/><stop offset=".48" stop-color="#DDAA68"/><stop offset="1" stop-color="#F8DBA0"/></linearGradient>
+  </defs>
+  <path d="M0 204C237 194 307 20 525 30c190 9 251 154 424 152 183-2 310-191 651-148v169c-297-64-428 105-631 106-207 1-248-155-433-123C341 216 224 369 0 354V204Z" fill="url(#silk-a)"/>
+  <path d="M176 0c151 108 279 230 453 212 192-20 275-171 446-153 188 19 296 196 525 174v112c-233 52-366-146-548-154-175-8-247 134-427 149C426 358 285 185 92 128L176 0Z" fill="url(#silk-b)"/>
+  <path d="M0 227C235 218 326 46 530 52c177 5 250 147 422 146 179-1 318-180 648-143" stroke="url(#gold)" stroke-width="2.2"/>
+  <path d="M37 298C236 300 337 119 521 117c180-2 252 137 425 133 190-4 330-177 630-121" stroke="#F9DFC0" stroke-opacity=".76" stroke-width="1.1"/>
+  <path d="M181 30c168 115 289 244 461 226 184-19 276-171 440-153 178 20 294 189 518 172" stroke="url(#gold)" stroke-opacity=".9" stroke-width="1.4"/>
+  <path d="M270 640c172-139 293-199 426-155 108 36 193 129 310 126 174-4 285-152 594-150" stroke="#DDAA68" stroke-opacity=".76" stroke-width="1.4"/>
+</svg>

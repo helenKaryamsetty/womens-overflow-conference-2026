@@ -1,0 +1,11 @@
+{
+  "/api/apps-script": {
+    "target": "https://script.google.com",
+    "secure": true,
+    "changeOrigin": true,
+    "followRedirects": true,
+    "pathRewrite": {
+      "^/api/apps-script$": "/macros/s/AKfycbzvtEZxl_ti-WZzI8Gb-2gKznHwJOnzR3ZzutolAS7u3ulMx_U0IhXnSqe3nZNoxXE/exec"
+    }
+  }
+}

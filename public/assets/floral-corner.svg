@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="none">
+  <defs>
+    <linearGradient id="petal" x1="125" y1="96" x2="374" y2="406" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF1E6"/><stop offset=".42" stop-color="#F1C7B5"/><stop offset="1" stop-color="#B66B72"/></linearGradient>
+    <linearGradient id="leaf" x1="163" y1="285" x2="365" y2="462" gradientUnits="userSpaceOnUse"><stop stop-color="#F4D6C1"/><stop offset="1" stop-color="#A95D67"/></linearGradient>
+    <radialGradient id="center" cx="0" cy="0" r="1" gradientTransform="matrix(25 28 -28 25 260 271)" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE8BD"/><stop offset="1" stop-color="#D7A36F"/></radialGradient>
+    <g id="petal-shape">
+      <path d="M260 268C230 238 201 189 211 143c8-37 34-65 49-82 18 21 43 50 50 85 9 45-20 92-50 122Z" fill="url(#petal)" fill-opacity=".86" stroke="#F7D6B5" stroke-width="2.3"/>
+      <path d="M260 252c-3-42-2-83 0-145m0 112c-13-24-25-40-39-55m39 75c13-23 27-43 43-59" stroke="#FFF0D7" stroke-opacity=".72" stroke-width="1.25"/>
+      <path d="M259 251c-15-41-22-77-22-112m23 102c10-35 22-64 39-89" stroke="#B76F72" stroke-opacity=".44" stroke-width=".8"/>
+    </g>
+    <g id="leaf-shape">
+      <path d="M258 344c-69-4-125 21-154 72 62 24 118 10 164-46 17-21 25-39 29-52-13 9-25 17-39 26Z" fill="url(#leaf)" fill-opacity=".74" stroke="#F1CEAC" stroke-width="2"/>
+      <path d="M131 407c54-21 108-48 165-88m-120 60 49 1m-15-21 9 29m23-46 8 26" stroke="#FFE6C8" stroke-opacity=".8" stroke-width="1.2"/>
+    </g>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M343 293c43 41 72 84 78 146m-92-127c-25 61-28 116-13 169m-71-170c-58 41-96 88-112 145m145-107c70-8 128 3 177 35" stroke="#DDB885" stroke-width="2"/>
+    <path d="M259 335c-2 63-4 113-20 171m48-154c31 53 73 91 126 116m-181-125c-46 7-88 27-126 62" stroke="#F4D2B1" stroke-opacity=".78" stroke-width="1.4"/>
+    <use href="#petal-shape" transform="rotate(0 260 271)"/><use href="#petal-shape" transform="rotate(60 260 271)"/><use href="#petal-shape" transform="rotate(120 260 271)"/><use href="#petal-shape" transform="rotate(180 260 271)"/><use href="#petal-shape" transform="rotate(240 260 271)"/><use href="#petal-shape" transform="rotate(300 260 271)"/>
+    <use href="#leaf-shape"/><use href="#leaf-shape" transform="translate(520 0) scale(-1 1) rotate(13 260 350)"/>
+    <circle cx="260" cy="271" r="26" fill="url(#center)" stroke="#FFF0CF" stroke-width="2"/><circle cx="260" cy="271" r="17" stroke="#FFF4D9" stroke-opacity=".7" stroke-width="1"/>
+    <path d="M251 272h18m-9-9v18m-6-15 12 12m0-12-12 12" stroke="#FFF4D9" stroke-opacity=".85" stroke-width="1"/>
+    <path d="M403 129c22 8 37 22 47 42m-35-56c20 2 36 11 51 27M102 302c-22-5-40-3-60 6m62-22c-16-15-35-22-55-23" stroke="#EBC99F" stroke-width="1.5"/>
+    <path d="M317 65c22 16 32 37 35 62m-87-43c10 22 12 44 6 65m-91 46c24 3 45 14 60 34m174 91c26 0 47 8 67 24" stroke="#FFF0D8" stroke-opacity=".62" stroke-width="1"/>
+  </g>
+</svg>

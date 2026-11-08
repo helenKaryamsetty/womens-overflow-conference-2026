@@ -1,0 +1,64 @@
+:root {
+  --plum-burgundy: #6b1434;
+  --deep-plum: #310817;
+  --champagne-gold: #c9a25d;
+  --soft-blush: #f0dfd5;
+  --warm-ivory: #fffaf3;
+  --supporting-cream: #f3eadc;
+  --primary-text: #321622;
+  --secondary-text: #74606a;
+  --success-green: #3f7955;
+  --warning-amber: #b47a32;
+  --error-red: #b34d52;
+  --shadow-soft: 0 18px 45px rgba(36, 12, 24, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  background: #f3eadc;
+  color: var(--primary-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+p {
+  margin: 0;
+}
+
+app-root {
+  display: block;
+  min-height: 100vh;
+}

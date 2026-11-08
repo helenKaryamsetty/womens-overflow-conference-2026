@@ -1,0 +1,33 @@
+<div class="drawer-overlay" [class.open]="open" *ngIf="open" (click)="close()">
+  <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="walk-in-title" (click)="$event.stopPropagation()">
+    <header class="drawer-header">
+      <div>
+        <p class="eyebrow">REGISTER</p>
+        <h2 id="walk-in-title">Walk-In Attendee</h2>
+      </div>
+      <button type="button" class="close-button" aria-label="Close walk-in form" (click)="close()">×</button>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="drawer-form">
+      <label>
+        <span>Attendee name</span>
+        <input type="text" formControlName="name" placeholder="Full name" />
+      </label>
+
+      <label>
+        <span>Mobile number</span>
+        <input type="tel" formControlName="phoneNumber" placeholder="9876543210" />
+      </label>
+
+      <label>
+        <span>Location</span>
+        <input type="text" formControlName="location" placeholder="City or area" />
+      </label>
+
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="close()">Cancel</button>
+        <button type="submit" class="primary-button" [disabled]="submitting">{{ submitting ? 'Registering…' : 'Register & Check In' }}</button>
+      </div>
+    </form>
+  </aside>
+</div>
