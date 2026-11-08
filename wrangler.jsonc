@@ -1,0 +1,10 @@
+{
+  "name": "womens-overflow-conference-2026",
+  "main": "./cloudflare-worker.js",
+  "compatibility_date": "2026-11-08",
+  "assets": {
+    "directory": "./dist/women-overflow-conference-2026/browser",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  }
+}
