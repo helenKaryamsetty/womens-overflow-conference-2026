@@ -78,9 +78,9 @@ export class AttendeeService {
     };
   }
 
-  recentArrivals(): Attendee[] {
-    return this.attendees.filter((attendee) => attendee.checkedIn)
-      .sort((left, right) => (right.checkedInAt ?? '').localeCompare(left.checkedInAt ?? ''));
+  recentArrivals(): CheckInRecord[] {
+    return [...this.checkIns]
+      .sort((left, right) => right.checkInTime.localeCompare(left.checkInTime));
   }
 
   checkIn(attendee: Attendee): Observable<ApiResponse> {

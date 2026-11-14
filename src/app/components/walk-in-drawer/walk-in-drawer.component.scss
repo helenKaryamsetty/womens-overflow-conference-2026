@@ -97,6 +97,18 @@ textarea:focus {
   margin-top: 1rem;
 }
 
+.form-error {
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(179, 77, 82, 0.28);
+  border-radius: 0.75rem;
+  background: rgba(179, 77, 82, 0.1);
+  color: #9c343a;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 .primary-button,
 .secondary-button {
   border: none;

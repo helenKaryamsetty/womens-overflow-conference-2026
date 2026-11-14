@@ -14,8 +14,10 @@ import { WalkInRegistration } from '../../models/attendance';
 export class WalkInDrawerComponent {
   @Input() open = false;
   @Input() submitting = false;
+  @Input() errorMessage: string | null = null;
   @Output() closed = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<WalkInRegistration>();
+  @Output() errorCleared = new EventEmitter<void>();
 
   readonly form: FormGroup;
 

@@ -130,6 +130,28 @@ describe('AttendeeService', () => {
     expect(service.recentArrivals()[0].name).toBe('Guest 6');
   });
 
+  it('returns each check-in record once when registrations share a phone number', () => {
+    const sharedPhone = '9876543210';
+    const arrival = {
+      name: 'Jamie Example',
+      phoneNumber: sharedPhone,
+      location: 'Hyderabad',
+      registrationType: 'REGISTRATION' as const,
+      checkInTime: '2026-11-08T09:30:00.000Z',
+    };
+
+    service.loadAttendees().subscribe((response) => expect(response.success).toBeTrue());
+    http.expectOne((request) => request.url === apiUrl && request.params.get('action') === 'getAll')
+      .flush({ success: true, count: 2, data: [
+        { sourceRow: 2, name: 'Jamie Example', phoneNumber: sharedPhone, location: 'Hyderabad' },
+        { sourceRow: 3, name: 'Jamie Example', phoneNumber: sharedPhone, location: 'Pune' },
+      ] });
+    http.expectOne((request) => request.url === apiUrl && request.params.get('action') === 'checkIns')
+      .flush({ success: true, count: 1, data: [arrival] });
+
+    expect(service.recentArrivals()).toEqual([arrival]);
+  });
+
   it('sends JSON as text/plain to avoid a cross-origin preflight', () => {
     service.registerWalkIn({ name: 'Guest', phoneNumber: '1234567890', location: 'Pune' }).subscribe();
     const request = http.expectOne(apiUrl);

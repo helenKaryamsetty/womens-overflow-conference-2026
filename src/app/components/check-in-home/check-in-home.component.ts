@@ -5,7 +5,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Subject, takeUntil, timer } from 'rxjs';
 import { debounceTime, distinctUntilChanged, exhaustMap } from 'rxjs/operators';
 
-import { Attendee, AttendanceSummary, ConnectionState, WalkInRegistration } from '../../models/attendance';
+import { Attendee, AttendanceSummary, CheckInRecord, ConnectionState, WalkInRegistration } from '../../models/attendance';
 import { AttendeeService } from '../../services/attendee.service';
 import { WalkInDrawerComponent } from '../walk-in-drawer/walk-in-drawer.component';
 
@@ -24,12 +24,13 @@ export class CheckInHomeComponent implements OnInit, OnDestroy {
   stats: AttendanceSummary = { checkedIn: 0, walkIns: 0, totalCheckedIn: 0 };
   attendees: Attendee[] = [];
   results: Attendee[] = [];
-  recentArrivals: Attendee[] = [];
+  recentArrivals: CheckInRecord[] = [];
   isSearching = false;
   isLoadingAttendees = true;
   loadError: string | null = null;
   isSubmittingWalkIn = false;
   isWalkInOpen = false;
+  walkInError: string | null = null;
   isCheckingInId: number | null = null;
   connectionState: ConnectionState = 'connected';
   latestSearchRequest = 0;
@@ -119,11 +120,14 @@ export class CheckInHomeComponent implements OnInit, OnDestroy {
   }
 
   openWalkInDrawer(): void {
+    this.walkInError = null;
+    this.toast = null;
     this.isWalkInOpen = true;
   }
 
   handleWalkIn(submission: WalkInRegistration): void {
     if (this.isSubmittingWalkIn) return;
+    this.walkInError = null;
     this.isSubmittingWalkIn = true;
 
     this.attendeeService.registerWalkIn(submission).subscribe((response) => {
@@ -142,10 +146,7 @@ export class CheckInHomeComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.toast = {
-        type: 'error',
-        message: response.message ?? response.error?.message ?? 'Walk-in registration failed.',
-      };
+      this.walkInError = response.message ?? response.error?.message ?? 'Walk-in registration failed.';
     });
   }
 

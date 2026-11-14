@@ -8,7 +8,7 @@
       <button type="button" class="close-button" aria-label="Close walk-in form" (click)="close()">×</button>
     </header>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="drawer-form">
+    <form [formGroup]="form" (ngSubmit)="submit()" (input)="errorCleared.emit()" class="drawer-form">
       <label>
         <span>Attendee name</span>
         <input type="text" formControlName="name" placeholder="Full name" />
@@ -23,6 +23,8 @@
         <span>Location</span>
         <input type="text" formControlName="location" placeholder="City or area" />
       </label>
+
+      <p class="form-error" *ngIf="errorMessage" role="alert" aria-live="assertive">{{ errorMessage }}</p>
 
       <div class="form-actions">
         <button type="button" class="secondary-button" (click)="close()">Cancel</button>

@@ -46,7 +46,7 @@
         </div>
       </header>
 
-      <div class="toast" *ngIf="toast" [class.success]="toast.type === 'success'" [class.error]="toast.type === 'error'" role="status" aria-live="polite">{{ toast.message }}</div>
+      <div class="toast" *ngIf="toast && !isWalkInOpen" [class.success]="toast.type === 'success'" [class.error]="toast.type === 'error'" role="status" aria-live="polite">{{ toast.message }}</div>
 
       <section class="search-panel" aria-label="Find an attendee">
         <label class="searchbox">
@@ -63,21 +63,6 @@
       </section>
 
       <section class="dashboard-row" *ngIf="!isLoadingAttendees && !loadError && !searchControl.value" aria-live="polite">
-        <div class="stats-grid">
-          <article class="stat-card featured">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m8 12 2.5 2.5L16.5 9" /></svg>
-            <strong>{{ stats.checkedIn }}</strong>
-            <span>Checked In</span>
-          </article>
-          <article class="stat-card">
-            <strong>{{ stats.walkIns }}</strong>
-            <span>Walk-ins</span>
-          </article>
-          <article class="stat-card featured">
-            <strong>{{ stats.totalCheckedIn }}</strong>
-            <span>Total Checked In</span>
-          </article>
-        </div>
         <button type="button" class="register-button" (click)="openWalkInDrawer()">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="4" /><path d="M2 21v-2a7 7 0 0 1 11-5.7M19 8v8m-4-4h8" /></svg>
           <span>Register Walk-in</span><span aria-hidden="true">→</span>
@@ -124,9 +109,9 @@
           </button>
         </div>
         <ul class="recent-list" *ngIf="recentArrivals.length; else noRecentArrivals">
-          <li *ngFor="let attendee of (showAllArrivals ? recentArrivals : recentArrivals.slice(0, 5))">
-            <span class="recent-avatar">{{ attendee.name.charAt(0) }}</span>
-            <span class="recent-person"><strong>{{ attendee.name }}</strong><small>{{ attendee.phoneNumber }} <span aria-hidden="true">•</span> {{ attendee.checkedInAt | date: 'shortTime' }}</small></span>
+          <li *ngFor="let arrival of (showAllArrivals ? recentArrivals : recentArrivals.slice(0, 5))">
+            <span class="recent-avatar">{{ arrival.name.charAt(0) }}</span>
+            <span class="recent-person"><strong>{{ arrival.name }}</strong><small>{{ arrival.phoneNumber }} <span aria-hidden="true">•</span> {{ arrival.checkInTime }}</small></span>
             <span class="recent-status">✓ Checked In</span>
           </li>
         </ul>
@@ -137,5 +122,5 @@
     </section>
   </div>
 
-  <app-walk-in-drawer [open]="isWalkInOpen" [submitting]="isSubmittingWalkIn" (closed)="isWalkInOpen = false" (submitted)="handleWalkIn($event)"></app-walk-in-drawer>
+  <app-walk-in-drawer [open]="isWalkInOpen" [submitting]="isSubmittingWalkIn" [errorMessage]="walkInError" (errorCleared)="walkInError = null" (closed)="isWalkInOpen = false" (submitted)="handleWalkIn($event)"></app-walk-in-drawer>
 </main>
